@@ -3,4 +3,5 @@ const cevap = await fetch("http://localhost:3000/kisiler", {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ name: "Ayşe", email: "ayse@ayse.com" }),
 });
-console.log(await cevap.json());
+console.log(cevap.status);
+console.log(await cevap.text());

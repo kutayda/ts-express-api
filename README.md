@@ -1,6 +1,6 @@
 # TypeScript Express API
 
-A small REST API built with **TypeScript** and **Express** while learning Node.js backend development. It manages a list of people (in memory) and supports creating, reading and deleting records.
+A small REST API built with **TypeScript** and **Express** while learning Node.js backend development. It stores people in a SQLite database and supports creating, reading and deleting records.
 
 ## Tech Stack
 
@@ -8,6 +8,7 @@ A small REST API built with **TypeScript** and **Express** while learning Node.j
 - TypeScript
 - Express
 - tsx (run TypeScript directly)
+- SQLite (better-sqlite3)
 
 ## Getting Started
 
@@ -22,7 +23,6 @@ The server starts on `http://localhost:3000`.
 
 | Method | Route            | Description                  | Success | Errors |
 |--------|------------------|------------------------------|---------|--------|
-| GET    | `/`              | Health message               | 200     | -      |
 | GET    | `/kisiler`       | List all people              | 200     | -      |
 | GET    | `/kisiler/:id`   | Get a single person by id    | 200     | 404    |
 | POST   | `/kisiler`       | Create a new person          | 201     | 400    |
@@ -51,13 +51,14 @@ If `name` or `email` is missing, the API returns `400` with an error message.
 - HTTP status codes (200, 201, 204, 400, 404)
 - Input validation and early returns
 - Testing endpoints with `fetch` scripts
+- Persisting data with SQLite and parameterized SQL queries
 
 ## Notes
 
-- Data is stored in memory, so it resets when the server restarts.
+- Data is persisted in a SQLite database (kisiler.db, created automatically on first run).
 
 ## Roadmap
 
-- [ ] Persist data with SQLite
+- [x] Persist data with SQLite
 - [ ] Authentication with JWT
 - [ ] Tests

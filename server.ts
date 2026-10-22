@@ -1,31 +1,32 @@
 import express from "express";
+import Database from "better-sqlite3";
 
 interface Kisi {
     id: number;
     name: string;
     email: string;
 }
-const kisiler: Kisi[] = [
-    {id: 1, name: "Kutay", email: "kutay@kutay.com"},
-    {id: 2, name: "Ahmet", email: "ahmet@ahmet.com"},
-    {id: 3, name: "Mehmet", email: "mehmet@mehmet.com"},
-]
+const db = new Database("kisiler.db");
+db.exec(`
+  CREATE TABLE IF NOT EXISTS kisiler (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    email TEXT NOT NULL
+  )
+`);
 const app = express();  
 app.use(express.json());
 
 app.get("/kisiler", (req, res) => {
+    const kisiler = db.prepare("SELECT * FROM kisiler").all();
     res.json(kisiler);
 })
 
-app.get("/", (req, res) => {
-    res.send("Merhaba API");
-});
-
 app.get("/kisiler/:id", (req, res) => {
     const id = Number(req.params.id);
-    const kisi = kisiler.find((k) => k.id === id);
+    const kisi = db.prepare("SELECT * FROM kisiler WHERE id = ?").get(id);
     if(!kisi){
-        res.status(404).json({Hata: "Kişi bulunamadı"});
+        res.status(404).json({hata: "Kişi bulunamadı"});
         return;
     }
     res.json(kisi);
@@ -34,27 +35,26 @@ app.get("/kisiler/:id", (req, res) => {
 app.post("/kisiler", (req, res) => {
     const {name, email} = req.body;
     if(!name || !email){
-        res.status(400).json({Hata: "name ve email zorunlu"});
+        res.status(400).json({hata: "name ve email zorunlu"});
         return; 
     }
-    const yeniKisi : Kisi = {
-        id: kisiler.length + 1,
+    const sonuc = db.prepare("INSERT INTO kisiler (name, email) VALUES (?, ?)").run(name, email);
+    const yeniKisi: Kisi = {
+        id: Number(sonuc.lastInsertRowid),
         name,
         email
     }
-    kisiler.push(yeniKisi);
     res.status(201).json(yeniKisi);
 });
 
 app.delete("/kisiler/:id", (req, res) => {
     const id = Number(req.params.id);
-    const index = kisiler.findIndex((k) => k.id === id);
-    if(index === -1){
-        res.status(404).json({Hata: "Kişi bulunamadı"});
-        return;
+    const sonuc = db.prepare("DELETE FROM kisiler WHERE id = ?").run(id);
+    if (sonuc.changes === 0) {
+        res.status(404).json({hata: "Kişi bulunamadı"});
+        return; 
     }
-    kisiler.splice(index, 1);
-    res.sendStatus(204).send();
+    res.sendStatus(204);
 });
 
 app.listen(3000, () => {
