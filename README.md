@@ -1,6 +1,6 @@
 # TypeScript Express API
 
-A small REST API built with **TypeScript** and **Express** while learning Node.js backend development. It stores people in a SQLite database, supports user registration and login with **JWT** authentication, and protects write operations behind a token.
+A small REST API built with **TypeScript** and **Express** while learning Node.js backend development. It stores people in a SQLite database, supports user registration and login with **JWT** authentication, protects write operations behind a token, and is covered by automated tests.
 
 ## Tech Stack
 
@@ -10,7 +10,17 @@ A small REST API built with **TypeScript** and **Express** while learning Node.j
 - SQLite (better-sqlite3)
 - JWT (jsonwebtoken)
 - bcryptjs (password hashing)
+- Vitest and Supertest (automated tests)
 - tsx (run TypeScript directly)
+
+## Project Structure
+
+```
+app.ts            Express app: routes, database setup, auth middleware (exported)
+server.ts         Starts the app on port 3000
+app.test.ts       Automated API tests
+vitest.config.ts  Test configuration (in-memory database, test secret)
+```
 
 ## Getting Started
 
@@ -33,6 +43,14 @@ npx tsx --env-file=.env server.ts
 ```
 
 The server starts on `http://localhost:3000`. The SQLite database (`kisiler.db`) is created automatically on first run. The server refuses to start if `JWT_SECRET` is not set.
+
+## Running Tests
+
+```bash
+npm test
+```
+
+Tests run against an in-memory SQLite database (`DB_PATH=:memory:`), so they never touch `kisiler.db`, and use a test-only JWT secret, so no `.env` file is required. They cover registration, login, duplicate registration, and protected routes with and without a token.
 
 ## Endpoints
 
@@ -96,6 +114,8 @@ Response (`201 Created`):
 - Password hashing with bcrypt (passwords are never stored or returned in plain text)
 - JWT authentication and an Express middleware that protects routes
 - Keeping secrets out of the code with environment variables (`.env` is git-ignored)
+- Separating the app from the server so it can be tested
+- Writing automated API tests with Vitest and Supertest
 
 ## Notes
 
@@ -106,4 +126,5 @@ Response (`201 Created`):
 
 - [x] Persist data with SQLite
 - [x] Authentication with JWT
-- [ ] Tests
+- [x] Automated tests
+- [ ] Deploy the API
